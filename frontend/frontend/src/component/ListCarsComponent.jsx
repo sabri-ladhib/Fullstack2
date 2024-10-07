@@ -52,7 +52,7 @@ const ListCarsComponent = () => {
             <div className="card h-100 shadow-sm rounded">
               <div className="car-img-wrapper" style={{ height: "200px", overflow: "hidden" }}>
                 <img
-                  src={car.image ? `data:image/jpeg;base64,${car.image}` : "default-image.png"}
+                  src={car.imageUrl ? car.imageUrl : "default-image.png"}
                   className="img-fluid w-100 object-fit-cover rounded-top"
                   alt={car.carName}
                   style={{ objectFit: "cover", height: "100%", transition: "transform 0.3s ease" }}

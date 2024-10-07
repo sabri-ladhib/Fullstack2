@@ -1,13 +1,17 @@
 import axios from "axios";
 
-const REST_API_BASE_URL = 'http://localhost:1996/api/cars';
+const REST_API_BASE_URL = 'http://localhost:1997/api/cars';
 
-export const listCars = () => axios.get(REST_API_BASE_URL);
+const headers = {
+    'Content-Type': 'application/json',
+  };
 
-export const getCar = (carid) => axios.get(REST_API_BASE_URL + '/' + carid);
+export const listCars = () => axios.get(REST_API_BASE_URL , headers);
 
-export const deleteCar = (carid) => axios.delete(REST_API_BASE_URL + '/' + carid);
+export const getCar = (carid) => axios.get(REST_API_BASE_URL + '/' + carid ,headers);
 
-export const createCars = (car) => axios.post(REST_API_BASE_URL, car);
+export const deleteCar = (carid) => axios.delete(REST_API_BASE_URL + '/' + carid , headers);
 
-export const updateCar = (carid, car) => axios.put(`${REST_API_BASE_URL}/${carid}`, car);
+export const createCars = (car) => axios.post(REST_API_BASE_URL, car , headers);
+
+export const updateCar = (carid, car) => axios.put(`${REST_API_BASE_URL}/${carid}`, car , headers);

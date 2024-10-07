@@ -1,13 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { createCars, getCar, updateCar } from '../Services/UserService';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const CarsComponent = () => {
   const [carName, setCarName] = useState('');
   const [status, setStatusCar] = useState('');
   const [prix, setPrixCar] = useState('');
-  const [photoFile, setPhotoFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [preview, setPreview] = useState('');
+  const [fileUploaded, setFileUploaded] = useState(null)
+
+
+  //cloudinary config
+
+  const CLOUDINARY_NAME = 'dmceraaov'
+  const CLOUDINARY_PRESET = 'yassinepreset'
+  const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/'
+
+  const uploadImageToCloud = async () => {
+    const formImage = new FormData()
+    formImage.append('file', fileUploaded)
+    formImage.append('upload_preset', CLOUDINARY_PRESET)
+    try {
+      const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_NAME}/upload`, formImage);
+      return res.data.url; // Return the URL directly
+    } catch (err) {
+      console.log('cloudinary err', err);
+      return null; // Handle error case by returning null or throwing an error
+    }
+
+  }
 
   const { id } = useParams();
   const [errors, setError] = useState({
@@ -18,48 +41,69 @@ const CarsComponent = () => {
   });
 
   const navigator = useNavigate();
+  const location = useLocation();
+  const pathName = location.pathname;
 
   useEffect(() => {
-    if (id) {
-      getCar(id).then((response) => {
-        setCarName(response.data.carName);
-        setStatusCar(response.data.status);
-        setPrixCar(response.data.prix);
-        setPreview(response.data.image);
-      }).catch(error => {
-        console.error(error);
-      });
-    }
-  }, [id]);
-
-  function saveOrUpdateCar(e) {
-    console.log.println("sabri");
-    e.preventDefault();
-
-    if (validateForm()) {
-      const formData = new FormData();
-      formData.append("carName", carName);
-      formData.append("status", status);
-      formData.append("prix", prix);
-      if (!photoFile && !preview) {
-        errorCopy.image = 'Car photo is required';
-        valid = false;
-     } else {
-        errorCopy.photo = '';
-     }
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ', ' + pair[1]);
-      }
-
+    console.log(pathName)
+    if (pathName.includes('edit-car')) {
       if (id) {
-        updateCar(id, formData, { headers }).then((response) => {
+        getCar(id).then((response) => {
+          setCarName(response.data.carName);
+          setStatusCar(response.data.status);
+          setPrixCar(response.data.prix);
+          setPreview(response.data.imageUrl);
+          setImageUrl(response.data.imageUrl)
+        }).catch(error => {
+          console.error(error);
+        });
+      }
+    }
+  }, [pathName, id]);
+
+  const saveOrUpdateCar = async (e) => {
+    e.preventDefault();
+    console.log('Submit Clicked');
+    console.log(validateForm)
+    if (validateForm()) {
+      // const formData = new FormData();
+      // formData.append("carName", carName);
+      // formData.append("status", status);
+      // formData.append("prix", prix);
+      //   if (!imageUrl && !preview) {
+      //     errorCopy.image = 'Car photo is required';
+      //     valid = false;
+      //  } else {
+      //     errorCopy.photo = '';
+      //  }
+      // for (let pair of formData.entries()) {
+      //   console.log(pair[0] + ', ' + pair[1]);
+      // }
+      let obj
+      if (id && pathName.includes('add-car')) {
+        const uploadedImageUrl = await uploadImageToCloud()
+        console.log(uploadedImageUrl)
+        obj = { carName, status, prix, imageUrl: uploadedImageUrl }
+        console.log(obj)
+      }else{
+        obj = { carName, status, prix, imageUrl }
+        console.log('updated' ,obj)
+      }
+      // Step 2: Ensure the imageUrl has been updated
+      // if (!imageUrl) {
+      //   console.error("Image URL is not set");
+      //   return; // Exit if the image URL is still not available
+      // }
+
+      if (id && pathName.includes('edit-car')) {
+        updateCar(id, obj).then((response) => {
           console.log(response.data);
           navigator('/cars');
         }).catch(error => {
           console.error(error);
         });
       } else {
-        createCars(formData).then((response) => {
+        createCars(obj).then((response) => {
           console.log(response.data);
           navigator('/cars');
         }).catch(error => {
@@ -72,12 +116,14 @@ const CarsComponent = () => {
   function handlePhotoChange(e) {
     const file = e.target.files[0];
     if (file) {
-      setPhotoFile(file);
+      setFileUploaded(file)
+      console.log('image ======>', URL.createObjectURL(file))
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(file);
+      console.log("reader", reader)
     }
   }
 
@@ -99,26 +145,26 @@ const CarsComponent = () => {
       valid = false;
     }
 
-    if (prix.trim()) {
+    if (prix.toString().trim()) {
       errorCopy.prix = '';
     } else {
       errorCopy.prix = 'Car price is required';
       valid = false;
     }
 
-    if (!photoFile) {
-      errorCopy.image = 'Car photo is required';
-      valid = false;
-    } else {
-      errorCopy.photo = '';
-    }
+    // if (!imageUrl) {
+    //   errorCopy.image = 'Car photo is required';
+    //   valid = false;
+    // } else {
+    //   errorCopy.photo = '';
+    // }
 
     setError(errorCopy);
     return valid;
   }
 
   function PageTitle() {
-    if (id) {
+    if (id && pathName.includes('edit-car')) {
       return <h2 className="text-center">Update Car</h2>;
     } else {
       return <h2 className="text-center">Add Car</h2>;
@@ -194,7 +240,7 @@ const CarsComponent = () => {
                 </div>
               )}
 
-              <button className="btn btn-success" type="submit">Submit</button>
+              <button className="btn btn-success" type='submit'>Submit</button>
             </form>
           </div>
         </div>

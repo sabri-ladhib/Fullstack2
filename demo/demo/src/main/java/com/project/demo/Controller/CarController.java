@@ -1,5 +1,6 @@
 package com.project.demo.Controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -13,12 +14,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.demo.Dto.CarDto;
 import com.project.demo.Service.CarService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
 @CrossOrigin("*")
 @AllArgsConstructor
 @RestController
@@ -28,7 +32,7 @@ public class CarController {
 	private CarService carService;
 	@PostMapping
 	
-	public ResponseEntity<CarDto> createCar(@RequestBody CarDto carDto){
+	public ResponseEntity<CarDto> createCar(@RequestBody CarDto carDto) {
 		CarDto savedcar = carService.createCar(carDto);
 		return new ResponseEntity<>(savedcar, HttpStatus.CREATED);
 	}

@@ -9,8 +9,8 @@ public class CarMapper {
 				car.getId(),
 				car.getCarName(),
 				car.getStatus(),
-				car.getPrix()
-				
+				car.getPrix(),
+				car.getImageUrl()
 				);
 		
 	}
@@ -20,8 +20,8 @@ public class CarMapper {
 					carDto.getId(),
 					carDto.getCarName(),
 					carDto.getStatus(),
-					carDto.getPrix()
-					
+					carDto.getPrix(),
+					carDto.getImageUrl()
 					);
 					
 		

@@ -11,9 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CarDto {
 	private Long id;
-	private String CarName;
-	private String Status;
-	private int Prix;
+	private String carName;
+	private String status;
+	private int prix;
+	private String imageUrl;
 	
 
 }

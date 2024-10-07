@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,13 +24,16 @@ public class Car {
 	
 	public Long id;
 	
-	@Column(name = "Car_Name")
-	private String CarName ;
+	@Column(name = "car_name")
+	private String carName ;
 	
-	@Column(name = "Status")
-	private String Status;
+	@Column(name = "status")
+	private String status;
 	
-	@Column(name = "PRIX")
-	private int Prix;
+	@Column(name = "prix")
+	private int prix;
+
+	@Column(name="image_url")
+	private String imageUrl;
 
 }
